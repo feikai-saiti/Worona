@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
+  <!-- Метаданные документа и адаптивный вьюпорт -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Ворона КАРтун — Авторская анимационная студия</title>
   <style>
+    /* Подключаем рукописные шрифты как резерв для шрифта Rivera */
     @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;600;700&family=Marck+Script&display=swap');
 
     @font-face {
@@ -15,7 +17,7 @@
 
     :root {
       --bg-base: #070b14;
-      --card-bg: rgba(13, 21, 38, 0.82);
+      --card-bg: rgba(13, 21, 38, 0.84);
       --card-border: rgba(56, 189, 248, 0.28);
       --sky: #38bdf8;
       --sky-light: #7dd3fc;
@@ -68,10 +70,10 @@
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: linear-gradient(180deg, rgba(7, 11, 20, 0.38) 0%, rgba(7, 11, 20, 0.68) 65%, rgba(7, 11, 20, 0.92) 100%);
+      background: linear-gradient(180deg, rgba(7, 11, 20, 0.45) 0%, rgba(7, 11, 20, 0.65) 65%, rgba(7, 11, 20, 0.94) 100%);
     }
 
-    /* Весь интерактивный контент поверх фона */
+    /* Основной слой интерфейса */
     #app-wrapper {
       position: relative;
       z-index: 5;
@@ -121,10 +123,12 @@
       color: #bae6fd;
       transition: transform 0.15s ease, background 0.15s ease;
     }
+
     .bar-btn:hover {
       background: #0f213d;
       transform: translateY(-1px);
     }
+
     .bar-btn.exit {
       background: #7f1d1d;
       color: #fecaca;
@@ -160,7 +164,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 40px 16px 48px;
+      padding: 40px 16px 44px;
       text-align: center;
       position: relative;
     }
@@ -180,7 +184,7 @@
       z-index: 15;
     }
 
-    /* Заголовок "Ворона КАРтун" + 100% синхронные мультяшные крылья */
+    /* Заголовок "Ворона КАРтун" + симметричные синхронные мультяшные крылья */
     .title-wings-wrap {
       display: inline-flex;
       flex-wrap: nowrap;
@@ -237,7 +241,7 @@
       filter: drop-shadow(0 0 18px rgba(56, 189, 248, 0.85));
     }
 
-    /* Строго синхронная анимация на внутренних группах крыльев с одинаковым cubic-bezier и animation-delay: 0s */
+    /* Строго синхронный зеркальный взмах обоих крыльев */
     .wing-pivot-left {
       transform-origin: 124px 52px;
       animation: syncFlapLeft 2.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) 0s infinite;
@@ -262,20 +266,23 @@
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(-14deg); }
     }
+
     @keyframes syncFlapRight {
       0%, 100% { transform: rotate(0deg); }
       50% { transform: rotate(14deg); }
     }
+
     @keyframes syncFlapLeftActive {
       0%, 100% { transform: rotate(4deg); }
       50% { transform: rotate(-26deg); }
     }
+
     @keyframes syncFlapRightActive {
       0%, 100% { transform: rotate(-4deg); }
       50% { transform: rotate(26deg); }
     }
 
-    /* Официальное круглое лого студии */
+    /* Круглое лого студии с холодной сине-голубой окантовкой */
     .main-logo-holder {
       position: relative;
       margin-bottom: 28px;
@@ -328,6 +335,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6);
       z-index: 10;
     }
+
     .badge-edit-btn.mini {
       width: 28px;
       height: 28px;
@@ -358,17 +366,17 @@
     .brand-accent {
       color: var(--sky-light);
       font-weight: 700;
-      text-shadow: 0 0 14px rgba(56, 189, 248, 0.55);
+      text-shadow: 0 0 14px rgba(56, 189, 248, 0.65);
     }
 
-    /* Кнопки соцсетей с увеличенным расстоянием */
+    /* Кнопки соцсетей с увеличенными отступами */
     .socials-list {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
       justify-content: center;
-      gap: 18px;
-      max-width: 720px;
+      gap: 18px 22px;
+      max-width: 760px;
       margin: 0 auto;
     }
 
@@ -376,14 +384,14 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      margin: 6px 10px;
+      margin: 6px 12px;
       padding: 12px 24px;
       border-radius: 16px;
       font-size: 15px;
       font-weight: 600;
       text-decoration: none;
       color: #f8fafc;
-      background: rgba(15, 25, 45, 0.85);
+      background: rgba(15, 25, 45, 0.88);
       border: 1px solid rgba(56, 189, 248, 0.35);
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45);
       transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -401,7 +409,7 @@
       flex-shrink: 0;
     }
 
-    /* Переходники на Мультфильмы и Арты (без стрелок и счётчиков) */
+    /* Карточки-переходники на Мультфильмы и Арты (без стрелок и счётчиков) */
     .portals-section {
       max-width: 740px;
       width: 100%;
@@ -593,8 +601,9 @@
 
     .arts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
       gap: 22px;
+      align-items: start;
     }
 
     .item-card {
@@ -621,16 +630,14 @@
       overflow: hidden;
     }
 
-    .movie-thumb img,
-    .art-thumb img {
+    .movie-thumb img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       transition: transform 0.35s ease;
     }
 
-    .item-card:hover .movie-thumb img,
-    .item-card:hover .art-thumb img {
+    .item-card:hover .movie-thumb img {
       transform: scale(1.04);
     }
 
@@ -655,12 +662,29 @@
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.65);
     }
 
+    /* Полное отображение артов без обрезки по квадрату и без скрытия краёв */
     .art-thumb {
       position: relative;
-      aspect-ratio: 4 / 5;
-      background: #091020;
+      width: 100%;
+      background: rgba(6, 11, 22, 0.72);
       cursor: pointer;
-      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+    }
+
+    .art-thumb img {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 14px;
+      transition: transform 0.25s ease;
+    }
+
+    .item-card:hover .art-thumb img {
+      transform: scale(1.02);
     }
 
     .item-info {
@@ -696,6 +720,7 @@
       font-weight: 600;
       cursor: pointer;
     }
+
     .btn-del:hover {
       background: #dc2626;
       color: #ffffff;
@@ -774,6 +799,7 @@
       justify-content: center;
       cursor: pointer;
     }
+
     .btn-lock:hover {
       background: rgba(56, 189, 248, 0.22);
       color: var(--sky-light);
@@ -835,6 +861,7 @@
       font-size: 16px;
       cursor: pointer;
     }
+
     .btn-x:hover {
       background: #dc2626;
     }
@@ -844,6 +871,7 @@
       aspect-ratio: 16 / 9;
       background: #000000;
     }
+
     .player-stage video,
     .player-stage iframe {
       width: 100%;
@@ -870,8 +898,9 @@
       cursor: zoom-in;
       transition: transform 0.25s ease;
     }
+
     .lightbox-stage img.is-zoomed {
-      transform: scale(1.55);
+      transform: scale(1.65);
       cursor: zoom-out;
     }
 
@@ -898,6 +927,7 @@
       background: rgba(255, 255, 255, 0.08);
       color: #cbd5e1;
     }
+
     .tab-pill.active {
       background: var(--sky);
       color: #05111f;
@@ -946,6 +976,7 @@
       grid-template-columns: 1fr;
       gap: 12px;
     }
+
     @media (min-width: 640px) {
       .grid-2 {
         grid-template-columns: 1fr 1fr;
@@ -984,6 +1015,7 @@
       color: #94a3b8;
       flex-shrink: 0;
     }
+
     .slot-thumb img {
       width: 100%;
       height: 100%;
@@ -995,33 +1027,15 @@
       flex-wrap: wrap;
       gap: 6px;
     }
-    .art-full-frame {
-  width: 100%;
-  background: rgba(6, 15, 32, 0.55);
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.art-full-img {
-  width: 100%;
-  height: auto;
-  max-height: none;
-  object-fit: contain;
-  display: block;
-}
-
   </style>
 </head>
 <body>
 
-  <!-- Фоновые слои (pointer-events: none, никогда не мешают кликам) -->
+  <!-- Фоновые слои (не мешают кликам по элементам страницы) -->
   <div id="site-bg-layer"></div>
   <div id="site-bg-dim"></div>
 
-  <!-- Уведомления -->
+  <!-- Контейнер всплывающих уведомлений -->
   <div id="toast-box"></div>
 
   <div id="app-wrapper">
@@ -1046,7 +1060,7 @@
           🖼️ Изменить фон сайта
         </button>
 
-        <!-- Заголовок "Ворона КАРтун" с двумя синхронными чёрными крыльями -->
+        <!-- Заголовок "Ворона КАРтун" с двумя синхронными мультяшными чёрными крыльями -->
         <div id="wings-trigger" class="title-wings-wrap" onclick="appPulseWings()">
           <!-- Левое крыло -->
           <svg class="wing-svg" viewBox="0 0 130 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -1073,7 +1087,7 @@
 
           <h1 class="studio-title">Ворона КАРтун</h1>
 
-          <!-- Правое крыло (точное зеркало левого с синхронным поворотом) -->
+          <!-- Правое крыло (точное зеркало левого с синхронным взмахом) -->
           <svg class="wing-svg" viewBox="0 0 130 96" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <g class="wing-pivot-right">
               <g transform="translate(130, 0) scale(-1, 1)">
@@ -1087,20 +1101,20 @@
           </svg>
         </div>
 
-        <!-- Официальное лого студии в кружке -->
+        <!-- Круглое лого студии с холодной сине-голубой окантовкой -->
         <div class="main-logo-holder">
           <div id="slot-mainLogo" class="main-logo-circle"></div>
           <button type="button" class="badge-edit-btn author-only is-hidden" onclick="appPickSlotFile('mainLogo')" title="Изменить главное лого">📷</button>
         </div>
 
-        <!-- Приветствие студии -->
+        <!-- Приветственный текст студии -->
         <div class="intro-card">
           <p>
             Добро пожаловать в мир авторской анимации "<span class="brand-accent">Ворона КАРтун</span>"! Здесь рождаются мультфильмы, и если вам такое по душе, то присоединяйтесь к нам!
           </p>
         </div>
 
-        <!-- Официальные соцсети -->
+        <!-- Кнопки соцсетей с хорошими отступами -->
         <div class="socials-list">
           <a href="https://youtube.com/@vorona_kartyn?si=KZQjMs8jDNu_6u_r" target="_blank" rel="noopener noreferrer" class="social-btn">
             <svg viewBox="0 0 24 24" fill="#f87171"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
@@ -1119,7 +1133,7 @@
         </div>
       </section>
 
-      <!-- Переходники на Мультфильмы и Арты -->
+      <!-- Переходники на Мультфильмы и Арты (без стрелок и счётчиков) -->
       <section class="portals-section">
         <div class="portal-card" onclick="appGo('movies')">
           <div class="mini-logo-holder">
@@ -1315,7 +1329,7 @@
             </div>
             <div class="grid-2">
               <div class="panel-card field-group">
-                <label>Видеофайл с компьютера (MP4 / WebM)</label>
+                <label>Видеофайл с устройства (MP4 / WebM)</label>
                 <input id="mov-file" type="file" accept="video/*" style="font-size:12px; color:#cbd5e1;" />
               </div>
               <div class="panel-card field-group">
@@ -1364,7 +1378,7 @@
         <div id="panel-backup" class="is-hidden" style="display:flex; flex-direction:column; gap:12px;">
           <h4 style="color:#7dd3fc;">Резервное копирование (JSON)</h4>
           <p style="font-size:13px; color:#cbd5e1;">
-            Сохраните все настройки, картинки, мультфильмы и арты в один файл, чтобы перенести на другой компьютер или загрузить при публикации сайта.
+            Сохраните все настройки, картинки, мультфильмы и арты в один файл, чтобы перенести на другое устройство или загрузить при публикации сайта.
           </p>
           <div style="display:flex; flex-wrap:wrap; gap:10px;">
             <button type="button" class="btn-sky" onclick="appExportBackup()">⬇️ Скачать бэкап (.json)</button>
@@ -1384,8 +1398,8 @@
   <!-- ==================== ПРЯМОЙ И НАДЁЖНЫЙ СКРИПТ В КОНЦЕ BODY ==================== -->
   <script>
     var AUTHOR_PASS = 'R8mK2xV7pQ4nT9zL';
-    var DB_NAME = 'VoronaKartunDB_v3';
-    var LS_KEY = 'vorona_kartun_backup_v3';
+    var DB_NAME = 'VoronaKartunDB_v4';
+    var LS_KEY = 'vorona_kartun_backup_v4';
 
     var SLOTS_META = [
       { id: 'bgHome', title: '1. Общий фон сайта', desc: 'Применяется на Главной, в «Мультфильмах» и «Артах»' },
@@ -1431,16 +1445,48 @@
     function safeLSGet(k) {
       try { return window.localStorage.getItem(k); } catch (e) { return null; }
     }
+
     function safeLSSet(k, v) {
       try { window.localStorage.setItem(k, v); } catch (e) {}
+    }
+
+    /* Возвращает метку времени создания записи для сортировки от нового к старому */
+    function getItemTime(item, fallbackIndex) {
+      if (!item) return 0;
+      if (typeof item.createdAt === 'number' && !isNaN(item.createdAt)) return item.createdAt;
+      if (typeof item.createdAt === 'string') {
+        var parsed = Date.parse(item.createdAt);
+        if (!isNaN(parsed)) return parsed;
+      }
+      if (typeof item.id === 'string') {
+        var match = item.id.match(/(\d{10,})/);
+        if (match) return Number(match[1]);
+      }
+      return Number(fallbackIndex) || 0;
+    }
+
+    /* Сортирует массив так, чтобы самые новые публикации шли сверху, а старые — внизу */
+    function sortNewestFirst(list) {
+      if (!Array.isArray(list)) return [];
+      return list
+        .map(function (item, idx) {
+          return { item: item, time: getItemTime(item, idx), origIdx: idx };
+        })
+        .sort(function (a, b) {
+          if (b.time !== a.time) return b.time - a.time;
+          return b.origIdx - a.origIdx;
+        })
+        .map(function (entry) {
+          return entry.item;
+        });
     }
 
     function saveStateToLS() {
       try {
         safeLSSet(LS_KEY, JSON.stringify({
           settings: appState.settings,
-          movies: appState.movies,
-          arts: appState.arts
+          movies: sortNewestFirst(appState.movies),
+          arts: sortNewestFirst(appState.arts)
         }));
       } catch (e) {}
     }
@@ -1482,13 +1528,15 @@
     }
 
     function dbPutRecord(store, obj) {
-      if (!obj.createdAt) obj.createdAt = Date.now();
+      if (typeof obj.createdAt !== 'number' || isNaN(obj.createdAt)) {
+        obj.createdAt = Date.now();
+      }
       var arr = appState[store];
       var found = false;
       for (var i = 0; i < arr.length; i++) {
         if (arr[i].id === obj.id) { arr[i] = obj; found = true; break; }
       }
-      if (!found) arr.unshift(obj);
+      if (!found) arr.push(obj);
       appState[store] = sortNewestFirst(arr);
       saveStateToLS();
       if (idbHandle) {
@@ -1510,16 +1558,6 @@
           tx.objectStore(store).delete(id);
         } catch (e) {}
       }
-    }
-
-    /* Сортировка от самого нового к самому старому по времени выкладывания */
-    function sortNewestFirst(list) {
-      if (!Array.isArray(list)) return [];
-      return list.slice().sort(function (a, b) {
-        var ta = Number(a && (a.createdAt || a.timestamp || a.id)) || 0;
-        var tb = Number(b && (b.createdAt || b.timestamp || b.id)) || 0;
-        return tb - ta;
-      });
     }
 
     function getSrc(val) {
@@ -1545,54 +1583,48 @@
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    /* Отрисовка списка мультфильмов (сверху новые, снизу старые) */
-    function renderMoviesList(containerId) {
-      var box = document.getElementById(containerId);
-      if (!box) return;
-      var sorted = sortNewestFirst(appState.movies);
-      if (!sorted.length) {
-        box.innerHTML = '<div class="empty-msg">Мультфильмов пока нет</div>';
-        return;
-      }
-      box.innerHTML = sorted.map(function (m) {
-        var delBtn = appState.isAuthor
-          ? '<button type="button" class="del-btn" data-del-store="movies" data-del-id="' + esc(m.id) + '">Удалить</button>'
-          : '';
-        return (
-          '<div class="media-card movie-card" data-open-movie="' + esc(m.id) + '">' +
-            '<div class="media-title">' + esc(m.title || 'Без названия') + '</div>' +
-            delBtn +
-          '</div>'
-        );
-      }).join('');
-    }
+    /* ==================== НАВИГАЦИЯ ==================== */
+    window.appGo = function (page) {
+      var home = document.getElementById('view-home');
+      var movies = document.getElementById('view-movies');
+      var arts = document.getElementById('view-arts');
 
-    /* Отрисовка списка артов: сверху новые, картинки показаны целиком без обрезки */
-    function renderArtsList(containerId) {
-      var box = document.getElementById(containerId);
-      if (!box) return;
-      var sorted = sortNewestFirst(appState.arts);
-      if (!sorted.length) {
-        box.innerHTML = '<div class="empty-msg">Артов пока нет</div>';
-        return;
+      home.classList.add('is-hidden');
+      movies.classList.add('is-hidden');
+      arts.classList.add('is-hidden');
+
+      if (page === 'movies') {
+        movies.classList.remove('is-hidden');
+      } else if (page === 'arts') {
+        arts.classList.remove('is-hidden');
+      } else {
+        home.classList.remove('is-hidden');
       }
-      box.innerHTML = sorted.map(function (a) {
-        var src = getSrc(a.src || a.data || a.image);
-        var delBtn = appState.isAuthor
-          ? '<button type="button" class="del-btn" data-del-store="arts" data-del-id="' + esc(a.id) + '">Удалить</button>'
-          : '';
-        return (
-          '<div class="media-card art-card" data-open-art="' + esc(a.id) + '">' +
-            '<div class="art-full-frame">' +
-              (src ? '<img class="art-full-img" src="' + esc(src) + '" alt="' + esc(a.title || 'Арт') + '" />' : '') +
-            '</div>' +
-            '<div class="media-title">' + esc(a.title || 'Без названия') + '</div>' +
-            delBtn +
-          '</div>'
-        );
-      }).join('');
-    }
-  </script>
+      window.scrollTo(0, 0);
+    };
+
+    window.appPulseWings = function () {
+      var el = document.getElementById('wings-trigger');
+      if (!el) return;
+      el.classList.add('is-active');
+      setTimeout(function () {
+        el.classList.remove('is-active');
+      }, 1700);
+    };
+
+    window.appCopyTag = function () {
+      var ta = document.createElement('textarea');
+      ta.value = '@Voronimylt';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        notify('Скопировано: @Voronimylt');
+      } catch (e) {
+        notify('Тег: @Voronimylt');
+      }
+      document.body.removeChild(ta);
+    };
 
     /* ==================== ОТРИСОВКА КАРТИНОК И СПИСКОВ ==================== */
     function renderAll() {
@@ -1600,6 +1632,9 @@
         URL.revokeObjectURL(appState.blobUrls[i]);
       }
       appState.blobUrls = [];
+
+      appState.movies = sortNewestFirst(appState.movies);
+      appState.arts = sortNewestFirst(appState.arts);
 
       var s = appState.settings;
       var bgEl = document.getElementById('site-bg-layer');
@@ -1650,13 +1685,14 @@
     function renderMoviesGrid() {
       var listEl = document.getElementById('movies-list');
       var emptyEl = document.getElementById('movies-empty');
-      if (!appState.movies.length) {
+      var sortedMovies = sortNewestFirst(appState.movies);
+      if (!sortedMovies.length) {
         listEl.innerHTML = '';
         emptyEl.classList.remove('is-hidden');
         return;
       }
       emptyEl.classList.add('is-hidden');
-      listEl.innerHTML = appState.movies.map(function (m) {
+      listEl.innerHTML = sortedMovies.map(function (m) {
         var thumb = getSrc(m.thumbnail);
         if (!thumb && m.youtubeId) {
           thumb = 'https://img.youtube.com/vi/' + m.youtubeId + '/hqdefault.jpg';
@@ -1688,13 +1724,14 @@
     function renderArtsGrid() {
       var listEl = document.getElementById('arts-list');
       var emptyEl = document.getElementById('arts-empty');
-      if (!appState.arts.length) {
+      var sortedArts = sortNewestFirst(appState.arts);
+      if (!sortedArts.length) {
         listEl.innerHTML = '';
         emptyEl.classList.remove('is-hidden');
         return;
       }
       emptyEl.classList.add('is-hidden');
-      listEl.innerHTML = appState.arts.map(function (a) {
+      listEl.innerHTML = sortedArts.map(function (a) {
         var src = getSrc(a.imageSource) || '';
         var delHtml = appState.isAuthor
           ? '<button type="button" class="btn-del" onclick="appDeleteArt(\'' + esc(a.id) + '\')">🗑️ Удалить</button>'
@@ -1920,9 +1957,12 @@
         return;
       }
 
+      var publishedAt = Date.now();
+
       function finishMovie(videoSrc, thumbSrc) {
         dbPutRecord('movies', {
-          id: 'mov_' + Date.now(),
+          id: 'mov_' + publishedAt + '_' + Math.random().toString(36).slice(2, 6),
+          createdAt: publishedAt,
           title: title,
           description: desc,
           youtubeId: url ? parseYouTube(url) : null,
@@ -1975,9 +2015,12 @@
         return;
       }
 
+      var publishedAt = Date.now();
+
       function saveArt(src) {
         dbPutRecord('arts', {
-          id: 'art_' + Date.now(),
+          id: 'art_' + publishedAt + '_' + Math.random().toString(36).slice(2, 6),
+          createdAt: publishedAt,
           title: title,
           description: desc,
           imageSource: src
@@ -2008,8 +2051,8 @@
       var payload = JSON.stringify({
         studio: 'Ворона КАРтун',
         settings: appState.settings,
-        movies: appState.movies.filter(function (m) { return typeof m.videoSource === 'string'; }),
-        arts: appState.arts
+        movies: sortNewestFirst(appState.movies).filter(function (m) { return typeof m.videoSource === 'string'; }),
+        arts: sortNewestFirst(appState.arts)
       });
       var blob = new Blob([payload], { type: 'application/json' });
       var u = URL.createObjectURL(blob);
@@ -2035,10 +2078,16 @@
             }
           }
           if (Array.isArray(data.movies)) {
-            data.movies.forEach(function (m) { dbPutRecord('movies', m); });
+            data.movies.forEach(function (m, idx) {
+              if (typeof m.createdAt !== 'number') m.createdAt = Date.now() - idx * 1000;
+              dbPutRecord('movies', m);
+            });
           }
           if (Array.isArray(data.arts)) {
-            data.arts.forEach(function (a) { dbPutRecord('arts', a); });
+            data.arts.forEach(function (a, idx) {
+              if (typeof a.createdAt !== 'number') a.createdAt = Date.now() - idx * 1000;
+              dbPutRecord('arts', a);
+            });
           }
           renderAll();
           notify('Бэкап восстановлен!');
@@ -2058,8 +2107,8 @@
           if (parsed.settings) {
             for (var k in parsed.settings) appState.settings[k] = parsed.settings[k];
           }
-          if (Array.isArray(parsed.movies)) appState.movies = parsed.movies;
-          if (Array.isArray(parsed.arts)) appState.arts = parsed.arts;
+          if (Array.isArray(parsed.movies)) appState.movies = sortNewestFirst(parsed.movies);
+          if (Array.isArray(parsed.arts)) appState.arts = sortNewestFirst(parsed.arts);
         } catch (e) {}
       }
 
@@ -2073,11 +2122,11 @@
               var tx2 = db.transaction('movies', 'readonly');
               tx2.objectStore('movies').getAll().onsuccess = function (e2) {
                 var mRows = e2.target.result || [];
-                if (mRows.length) appState.movies = mRows;
+                if (mRows.length) appState.movies = sortNewestFirst(mRows);
                 var tx3 = db.transaction('arts', 'readonly');
                 tx3.objectStore('arts').getAll().onsuccess = function (e3) {
                   var aRows = e3.target.result || [];
-                  if (aRows.length) appState.arts = aRows;
+                  if (aRows.length) appState.arts = sortNewestFirst(aRows);
                   seedDefaultsIfEmpty();
                   renderAll();
                 };
@@ -2091,9 +2140,11 @@
       });
 
       function seedDefaultsIfEmpty() {
+        var now = Date.now();
         if (!appState.movies.length) {
           appState.movies.push({
-            id: 'demo_mov_1',
+            id: 'demo_mov_' + now,
+            createdAt: now,
             title: 'Тизер студии «Ворона КАРтун» (Демо)',
             description: 'Нажмите, чтобы открыть плеер. В режиме автора можно удалить и загрузить свои видео.',
             youtubeId: 'aqz-KE-bpKQ',
@@ -2104,12 +2155,15 @@
         if (!appState.arts.length) {
           var svgArt = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#0b1324"/><circle cx="600" cy="150" r="70" fill="#bae6fd"/><path d="M270 370 C290 250 370 190 460 195 C495 197 520 212 535 230 L605 245 L535 275 C525 340 475 405 390 420 L365 485 L325 485 L345 415 C305 408 275 390 270 370 Z" fill="#060911" stroke="#38bdf8" stroke-width="5"/><circle cx="490" cy="240" r="11" fill="#7dd3fc"/></svg>';
           appState.arts.push({
-            id: 'demo_art_1',
+            id: 'demo_art_' + now,
+            createdAt: now,
             title: 'Ворона в ночи (Демо-арт)',
             description: 'Нажмите, чтобы рассмотреть арт подробнее.',
             imageSource: 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgArt)
           });
         }
+        appState.movies = sortNewestFirst(appState.movies);
+        appState.arts = sortNewestFirst(appState.arts);
       }
 
       renderAll();
