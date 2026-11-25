@@ -1464,12 +1464,14 @@
     }
 
     function dbPutRecord(store, obj) {
+      if (!obj.createdAt) obj.createdAt = Date.now();
       var arr = appState[store];
       var found = false;
       for (var i = 0; i < arr.length; i++) {
         if (arr[i].id === obj.id) { arr[i] = obj; found = true; break; }
       }
       if (!found) arr.unshift(obj);
+      appState[store] = sortNewestFirst(arr);
       saveStateToLS();
       if (idbHandle) {
         try {
@@ -1480,7 +1482,9 @@
     }
 
     function dbDeleteRecord(store, id) {
-      appState[store] = appState[store].filter(function (item) { return item.id !== id; });
+      appState[store] = sortNewestFirst(
+        appState[store].filter(function (item) { return item.id !== id; })
+      );
       saveStateToLS();
       if (idbHandle) {
         try {
@@ -1488,6 +1492,16 @@
           tx.objectStore(store).delete(id);
         } catch (e) {}
       }
+    }
+
+    /* Сортировка от самого нового к самому старому по времени выкладывания */
+    function sortNewestFirst(list) {
+      if (!Array.isArray(list)) return [];
+      return list.slice().sort(function (a, b) {
+        var ta = Number(a && (a.createdAt || a.timestamp || a.id)) || 0;
+        var tb = Number(b && (b.createdAt || b.timestamp || b.id)) || 0;
+        return tb - ta;
+      });
     }
 
     function getSrc(val) {
@@ -1513,48 +1527,54 @@
       return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
     }
 
-    /* ==================== НАВИГАЦИЯ ==================== */
-    window.appGo = function (page) {
-      var home = document.getElementById('view-home');
-      var movies = document.getElementById('view-movies');
-      var arts = document.getElementById('view-arts');
-
-      home.classList.add('is-hidden');
-      movies.classList.add('is-hidden');
-      arts.classList.add('is-hidden');
-
-      if (page === 'movies') {
-        movies.classList.remove('is-hidden');
-      } else if (page === 'arts') {
-        arts.classList.remove('is-hidden');
-      } else {
-        home.classList.remove('is-hidden');
+    /* Отрисовка списка мультфильмов (сверху новые, снизу старые) */
+    function renderMoviesList(containerId) {
+      var box = document.getElementById(containerId);
+      if (!box) return;
+      var sorted = sortNewestFirst(appState.movies);
+      if (!sorted.length) {
+        box.innerHTML = '<div class="empty-msg">Мультфильмов пока нет</div>';
+        return;
       }
-      window.scrollTo(0, 0);
-    };
+      box.innerHTML = sorted.map(function (m) {
+        var delBtn = appState.isAuthor
+          ? '<button type="button" class="del-btn" data-del-store="movies" data-del-id="' + esc(m.id) + '">Удалить</button>'
+          : '';
+        return (
+          '<div class="media-card movie-card" data-open-movie="' + esc(m.id) + '">' +
+            '<div class="media-title">' + esc(m.title || 'Без названия') + '</div>' +
+            delBtn +
+          '</div>'
+        );
+      }).join('');
+    }
 
-    window.appPulseWings = function () {
-      var el = document.getElementById('wings-trigger');
-      if (!el) return;
-      el.classList.add('is-active');
-      setTimeout(function () {
-        el.classList.remove('is-active');
-      }, 1700);
-    };
-
-    window.appCopyTag = function () {
-      var ta = document.createElement('textarea');
-      ta.value = '@Voronimylt';
-      document.body.appendChild(ta);
-      ta.select();
-      try {
-        document.execCommand('copy');
-        notify('Скопировано: @Voronimylt');
-      } catch (e) {
-        notify('Тег: @Voronimylt');
+    /* Отрисовка списка артов: сверху новые, картинки показаны целиком без обрезки */
+    function renderArtsList(containerId) {
+      var box = document.getElementById(containerId);
+      if (!box) return;
+      var sorted = sortNewestFirst(appState.arts);
+      if (!sorted.length) {
+        box.innerHTML = '<div class="empty-msg">Артов пока нет</div>';
+        return;
       }
-      document.body.removeChild(ta);
-    };
+      box.innerHTML = sorted.map(function (a) {
+        var src = getSrc(a.src || a.data || a.image);
+        var delBtn = appState.isAuthor
+          ? '<button type="button" class="del-btn" data-del-store="arts" data-del-id="' + esc(a.id) + '">Удалить</button>'
+          : '';
+        return (
+          '<div class="media-card art-card" data-open-art="' + esc(a.id) + '">' +
+            '<div class="art-full-frame">' +
+              (src ? '<img class="art-full-img" src="' + esc(src) + '" alt="' + esc(a.title || 'Арт') + '" />' : '') +
+            '</div>' +
+            '<div class="media-title">' + esc(a.title || 'Без названия') + '</div>' +
+            delBtn +
+          '</div>'
+        );
+      }).join('');
+    }
+  </script>
 
     /* ==================== ОТРИСОВКА КАРТИНОК И СПИСКОВ ==================== */
     function renderAll() {
