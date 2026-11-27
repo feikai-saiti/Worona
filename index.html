@@ -1059,6 +1059,75 @@
       color: #94a3b8;
       line-height: 1.5;
     }
+
+    .sync-dirty-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: rgba(245, 158, 11, 0.18);
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      color: #fde68a;
+    }
+
+    .sync-dirty-badge.is-clean {
+      background: rgba(16, 185, 129, 0.16);
+      border-color: rgba(52, 211, 153, 0.45);
+      color: #a7f3d0;
+    }
+
+    .storage-profile-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(13, 21, 38, 0.92);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .storage-profile-card.is-selected {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.4);
+    }
+
+    .storage-profile-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      min-width: 180px;
+      flex: 1;
+    }
+
+    .storage-profile-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .storage-tag {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.2);
+      color: #7dd3fc;
+      font-weight: 700;
+    }
+
+    .storage-profile-sub {
+      font-size: 12px;
+      color: #94a3b8;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
@@ -1074,12 +1143,16 @@
     <!-- Верхняя панель режима автора -->
     <div id="author-top-bar" class="is-hidden">
       <div class="author-bar-inner">
-        <span>● Режим автора «Ворона КАРтун» активен</span>
+        <div style="display:flex; flex-wrap:wrap; align-items:center; gap:10px;">
+          <span>● Режим автора «Ворона КАРтун» активен</span>
+          <span id="author-dirty-indicator" class="sync-dirty-badge is-clean">✓ Все изменения опубликованы</span>
+        </div>
         <div class="author-bar-btns">
           <button type="button" class="bar-btn" onclick="appOpenAuthor('images')">🎨 Все 6 картинок и фон</button>
           <button type="button" class="bar-btn" onclick="appOpenAuthor('movies')">🎬 + Мультфильм</button>
           <button type="button" class="bar-btn" onclick="appOpenAuthor('arts')">🖼️ + Арт</button>
-          <button type="button" class="bar-btn" onclick="appOpenAuthor('cloud')">☁️ Облако</button>
+          <button type="button" class="bar-btn" onclick="appOpenAuthor('cloud')">☁️ Облако и сохранение</button>
+          <button type="button" class="bar-btn" style="background:#0284c7; color:#ffffff;" onclick="appPushCloudState(true)">🌐 Сохранить изменения в сеть</button>
           <button type="button" class="bar-btn" onclick="appOpenAuthor('backup')">💾 Бэкап</button>
           <button type="button" class="bar-btn exit" onclick="appLogoutAuthor()">Выйти</button>
         </div>
@@ -1330,7 +1403,7 @@
           <button type="button" id="tab-images" class="tab-pill active" onclick="appSwitchTab('images')">🎨 Все 6 картинок и фон</button>
           <button type="button" id="tab-movies" class="tab-pill" onclick="appSwitchTab('movies')">🎬 + Мультфильм</button>
           <button type="button" id="tab-arts" class="tab-pill" onclick="appSwitchTab('arts')">🖼️ + Арт</button>
-          <button type="button" id="tab-cloud" class="tab-pill" onclick="appSwitchTab('cloud')">☁️ Облако</button>
+          <button type="button" id="tab-cloud" class="tab-pill" onclick="appSwitchTab('cloud')">☁️ Облако и сохранение</button>
           <button type="button" id="tab-backup" class="tab-pill" onclick="appSwitchTab('backup')">💾 Бэкап</button>
         </div>
         <button type="button" class="btn-x" onclick="appCloseAuthor()">✕</button>
@@ -1345,6 +1418,10 @@
               <span id="dim-val-label">65%</span>
             </div>
             <input id="dim-slider" type="range" min="10" max="90" value="65" oninput="appChangeDim(this.value)" style="width:100%; accent-color:#38bdf8; cursor:pointer;" />
+          </div>
+          <div class="panel-card field-group">
+            <label>Активное облачное хранилище для загрузки картинок и слотов</label>
+            <select id="active-storage-select-images" class="inp-text" onchange="appSelectStorageProfile(this.value)"></select>
           </div>
           <div id="slots-editor-list" style="display:flex; flex-direction:column; gap:10px;"></div>
         </div>
@@ -1361,14 +1438,18 @@
               <label>Описание (необязательно)</label>
               <input id="mov-desc" type="text" class="inp-text" placeholder="Краткое описание..." />
             </div>
+            <div class="field-group">
+              <label>Хранилище для загрузки видеофайла и обложки</label>
+              <select id="active-storage-select-movies" class="inp-text" onchange="appSelectStorageProfile(this.value)"></select>
+            </div>
             <div class="grid-2">
               <div class="panel-card field-group">
                 <label>Видеофайл с устройства (MP4 / WebM)</label>
                 <input id="mov-file" type="file" accept="video/*" style="font-size:12px; color:#cbd5e1;" />
               </div>
               <div class="panel-card field-group">
-                <label>Или ссылка (YouTube / прямая MP4)</label>
-                <input id="mov-url" type="url" class="inp-text" placeholder="https://youtube.com/watch?v=..." />
+                <label>Или ссылка (YouTube / любое хранилище)</label>
+                <input id="mov-url" type="url" class="inp-text" placeholder="https://youtube.com/watch?v=... или ссылка из облака" />
               </div>
             </div>
             <div class="panel-card field-group">
@@ -1378,7 +1459,7 @@
                 <input id="mov-thumb-url" type="url" class="inp-text" placeholder="Или ссылка на обложку..." />
               </div>
             </div>
-            <button type="submit" class="btn-sky" style="padding:12px; font-size:15px;">Опубликовать мультфильм</button>
+            <button type="submit" class="btn-sky" style="padding:12px; font-size:15px;">Добавить в черновик и сохранить локально</button>
           </form>
         </div>
 
@@ -1394,91 +1475,131 @@
               <label>Описание (необязательно)</label>
               <input id="art-desc" type="text" class="inp-text" placeholder="Заметка автора..." />
             </div>
+            <div class="field-group">
+              <label>Хранилище для загрузки файла арта</label>
+              <select id="active-storage-select-arts" class="inp-text" onchange="appSelectStorageProfile(this.value)"></select>
+            </div>
             <div class="grid-2">
               <div class="panel-card field-group">
                 <label>Выбрать файл картинки *</label>
                 <input id="art-file" type="file" accept="image/*" style="font-size:12px; color:#cbd5e1;" />
               </div>
               <div class="panel-card field-group">
-                <label>Или ссылка на изображение</label>
+                <label>Или ссылка на изображение из любого хранилища</label>
                 <input id="art-url" type="url" class="inp-text" placeholder="https://..." />
               </div>
             </div>
-            <button type="submit" class="btn-sky" style="padding:12px; font-size:15px;">Опубликовать арт</button>
+            <button type="submit" class="btn-sky" style="padding:12px; font-size:15px;">Добавить арт</button>
           </form>
         </div>
 
-        <!-- Вкладка 4: Внешнее облачное хранилище и общая синхронизация -->
+        <!-- Вкладка 4: Несколько облачных хранилищ и публикация изменений для всех -->
         <div id="panel-cloud" class="is-hidden" style="display:flex; flex-direction:column; gap:12px;">
           <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:10px;">
-            <h4 style="color:#7dd3fc;">Внешнее облачное хранилище (для всех пользователей)</h4>
+            <h4 style="color:#7dd3fc;">Несколько облачных хранилищ и публикация для всех</h4>
             <span id="cloud-status-badge" class="cloud-status-badge is-offline">● Локальный режим</span>
           </div>
           <p class="cloud-hint">
-            Подключите внешнее хранилище файлов (Cloudinary или S3/Supabase-совместимый URL загрузки) и облачную базу/JSON-хранилище (например, JSONBin, Supabase REST или свой endpoint), чтобы арты, мультфильмы, логотипы и фон загружались в облако и сразу отображались у всех зрителей на любых устройствах.
+            Вы можете добавить сколько угодно профилей облачных хранилищ (например, «Хранилище 1», «Хранилище 2», отдельные пресеты Cloudinary или свои HTTP-эндпоинты), переключаться между ними при загрузке картинок, логотипов, фонов и видео, а затем нажать <strong>«Сохранить изменения в сеть»</strong>, чтобы все правки из разных хранилищ появились у всех пользователей на всех устройствах.
           </p>
 
-          <form onsubmit="appSaveCloudConfig(event)" style="display:flex; flex-direction:column; gap:10px;">
-            <div class="panel-card" style="display:flex; flex-direction:column; gap:10px;">
-              <div style="font-size:13px; font-weight:700; color:#bae6fd;">1. Облако для файлов (картинки, лого, фон, видео)</div>
-              <div class="field-group">
-                <label>Провайдер загрузки файлов</label>
-                <select id="cloud-upload-provider" class="inp-text" onchange="appToggleCloudProviderFields()">
-                  <option value="cloudinary">Cloudinary (unsigned upload preset)</option>
-                  <option value="custom_post">Универсальный HTTP POST endpoint (multipart FormData)</option>
-                </select>
-              </div>
-
-              <div id="cloud-cloudinary-fields" class="grid-2">
-                <div class="field-group">
-                  <label>Cloudinary Cloud Name</label>
-                  <input id="cloud-name" type="text" class="inp-text" placeholder="например: dxyz123abc" />
-                </div>
-                <div class="field-group">
-                  <label>Unsigned Upload Preset</label>
-                  <input id="cloud-preset" type="text" class="inp-text" placeholder="например: vorona_unsigned" />
-                </div>
-              </div>
-
-              <div id="cloud-custom-upload-fields" class="grid-2 is-hidden">
-                <div class="field-group">
-                  <label>URL загрузки файлов (POST)</label>
-                  <input id="cloud-upload-url" type="url" class="inp-text" placeholder="https://your-storage.example.com/upload" />
-                </div>
-                <div class="field-group">
-                  <label>Ключ URL в ответе JSON (по умолчанию url)</label>
-                  <input id="cloud-upload-url-key" type="text" class="inp-text" placeholder="url или secure_url" />
-                </div>
-              </div>
+          <!-- Список сохранённых профилей хранилищ -->
+          <div class="panel-card" style="display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:8px;">
+              <span style="font-size:13px; font-weight:700; color:#bae6fd;">1. Профили облачных хранилищ файлов</span>
+              <button type="button" class="btn-sky-outline" onclick="appStartNewStorageProfile()">+ Новый профиль</button>
             </div>
+            <div id="storage-profiles-list" style="display:flex; flex-direction:column; gap:8px;"></div>
 
-            <div class="panel-card" style="display:flex; flex-direction:column; gap:10px;">
-              <div style="font-size:13px; font-weight:700; color:#bae6fd;">2. Общее облачное состояние сайта (слоты, мульты, арты)</div>
+            <!-- Форма создания / редактирования профиля хранилища -->
+            <form onsubmit="appSaveStorageProfile(event)" style="display:flex; flex-direction:column; gap:10px; margin-top:4px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.08);">
+              <input id="sp-edit-id" type="hidden" />
               <div class="grid-2">
                 <div class="field-group">
-                  <label>URL чтения/записи состояния (GET / PUT)</label>
-                  <input id="cloud-state-url" type="url" class="inp-text" placeholder="https://api.jsonbin.io/v3/b/ВАШ_BIN_ID" />
+                  <label>Название хранилища *</label>
+                  <input id="sp-name" type="text" class="inp-text" placeholder="Например: Облако 1 (Арты и фон)" required />
                 </div>
                 <div class="field-group">
-                  <label>Заголовок доступа (опционально, например X-Master-Key)</label>
-                  <input id="cloud-state-header-name" type="text" class="inp-text" placeholder="X-Master-Key или Authorization" />
+                  <label>Тип подключения</label>
+                  <select id="sp-provider" class="inp-text" onchange="appToggleProfileProviderFields()">
+                    <option value="cloudinary">Cloudinary (unsigned preset)</option>
+                    <option value="custom_post">Свой HTTP-сервер / S3-шлюз (POST)</option>
+                  </select>
                 </div>
               </div>
-              <div class="field-group">
-                <label>Токен / ключ доступа к состоянию (опционально)</label>
-                <input id="cloud-state-header-val" type="password" class="inp-text" placeholder="Секретный ключ или Bearer токен..." />
-              </div>
-              <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1; cursor:pointer;">
-                <input id="cloud-auto-sync" type="checkbox" checked style="accent-color:#38bdf8;" />
-                <span>Автоматически подтягивать обновления из облака при открытии и смене вкладок</span>
-              </label>
-            </div>
 
-            <div style="display:flex; flex-wrap:wrap; gap:8px;">
-              <button type="submit" class="btn-sky">💾 Сохранить настройки облака</button>
-              <button type="button" class="btn-sky-outline" onclick="appPullCloudState(true)">⬇️ Загрузить из облака</button>
-              <button type="button" class="btn-sky-outline" onclick="appPushCloudState(true)">⬆️ Выгрузить текущее в облако</button>
-              <button type="button" class="btn-del" onclick="appClearCloudConfig()">Сбросить облако</button>
+              <div id="sp-cloudinary-box" class="grid-2">
+                <div class="field-group">
+                  <label>Cloudinary Cloud Name *</label>
+                  <input id="sp-cloud-name" type="text" class="inp-text" placeholder="например: dxyz123abc" />
+                </div>
+                <div class="field-group">
+                  <label>Unsigned Upload Preset *</label>
+                  <input id="sp-upload-preset" type="text" class="inp-text" placeholder="например: vorona_preset" />
+                </div>
+              </div>
+
+              <div id="sp-custom-box" style="display:flex; flex-direction:column; gap:10px;" class="is-hidden">
+                <div class="grid-2">
+                  <div class="field-group">
+                    <label>URL загрузки (POST) *</label>
+                    <input id="sp-upload-url" type="url" class="inp-text" placeholder="https://example.com/api/upload" />
+                  </div>
+                  <div class="field-group">
+                    <label>Имя поля файла (по умолчанию file)</label>
+                    <input id="sp-field-name" type="text" class="inp-text" placeholder="file" />
+                  </div>
+                </div>
+                <div class="grid-2">
+                  <div class="field-group">
+                    <label>Заголовок авторизации (опционально)</label>
+                    <input id="sp-header-name" type="text" class="inp-text" placeholder="Authorization или X-API-Key" />
+                  </div>
+                  <div class="field-group">
+                    <label>Значение заголовка (опционально)</label>
+                    <input id="sp-header-val" type="password" class="inp-text" placeholder="Bearer ..." />
+                  </div>
+                </div>
+                <div class="field-group">
+                  <label>Путь к URL в ответе JSON (например: url, secure_url, data.url)</label>
+                  <input id="sp-url-key" type="text" class="inp-text" placeholder="url" />
+                </div>
+              </div>
+
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button type="submit" class="btn-sky">💾 Сохранить профиль хранилища</button>
+                <button type="button" class="btn-sky-outline" onclick="appStartNewStorageProfile()">Очистить форму</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Общее облачное состояние для всех устройств -->
+          <form onsubmit="appSaveCloudStateConfig(event)" class="panel-card" style="display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:13px; font-weight:700; color:#bae6fd;">2. Общая сеть / JSON-хранилище состояния для всех зрителей</div>
+            <div class="grid-2">
+              <div class="field-group">
+                <label>URL чтения и сохранения состояния сайта (GET / PUT)</label>
+                <input id="cloud-state-url" type="url" class="inp-text" placeholder="https://api.jsonbin.io/v3/b/ВАШ_BIN_ID" />
+              </div>
+              <div class="field-group">
+                <label>Имя заголовка доступа (опционально)</label>
+                <input id="cloud-state-header-name" type="text" class="inp-text" placeholder="X-Master-Key или Authorization" />
+              </div>
+            </div>
+            <div class="field-group">
+              <label>Ключ / токен доступа к состоянию (опционально)</label>
+              <input id="cloud-state-header-val" type="password" class="inp-text" placeholder="Секретный ключ или Bearer токен..." />
+            </div>
+            <label style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1; cursor:pointer;">
+              <input id="cloud-auto-sync" type="checkbox" checked style="accent-color:#38bdf8;" />
+              <span>Автоматически загружать свежие данные из сети при открытии и переключении разделов</span>
+            </label>
+
+            <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;">
+              <button type="submit" class="btn-sky-outline">Сохранить адрес сети</button>
+              <button type="button" class="btn-sky" onclick="appPushCloudState(true)">🌐 Сохранить изменения в сеть (для всех)</button>
+              <button type="button" class="btn-sky-outline" onclick="appPullCloudState(true)">⬇️ Загрузить из сети</button>
+              <button type="button" class="btn-del" onclick="appClearCloudStateConfig()">Очистить адрес сети</button>
             </div>
           </form>
         </div>
@@ -1509,7 +1630,7 @@
     var AUTHOR_PASS = 'R8mK2xV7pQ4nT9zL';
     var DB_NAME = 'VoronaKartunDB_v4';
     var LS_KEY = 'vorona_kartun_backup_v4';
-    var CLOUD_CFG_KEY = 'vorona_kartun_cloud_cfg_v1';
+    var CLOUD_CFG_KEY = 'vorona_kartun_cloud_cfg_v2';
 
     var SLOTS_META = [
       { id: 'bgHome', title: '1. Общий фон сайта', desc: 'Применяется на Главной, в «Мультфильмах» и «Артах»' },
@@ -1520,17 +1641,44 @@
       { id: 'cornerArts', title: '6. Иконка «На главную» (Арты)', desc: 'Маленькая картинка у кнопки возврата в артах' }
     ];
 
+    function createDefaultStorageProfiles() {
+      return [
+        {
+          id: 'storage_main',
+          name: 'Основное хранилище (Cloudinary)',
+          provider: 'cloudinary',
+          cloudName: '',
+          uploadPreset: '',
+          uploadUrl: '',
+          fieldName: 'file',
+          headerName: '',
+          headerVal: '',
+          urlKey: 'secure_url'
+        },
+        {
+          id: 'storage_extra',
+          name: 'Дополнительное хранилище (Свой сервер / S3)',
+          provider: 'custom_post',
+          cloudName: '',
+          uploadPreset: '',
+          uploadUrl: '',
+          fieldName: 'file',
+          headerName: '',
+          headerVal: '',
+          urlKey: 'url'
+        }
+      ];
+    }
+
     var appState = {
       isAuthor: false,
       activeSlot: null,
       zoomed: false,
+      hasUnpublishedChanges: false,
       blobUrls: [],
       cloudConfig: {
-        provider: 'cloudinary',
-        cloudName: '',
-        uploadPreset: '',
-        uploadUrl: '',
-        uploadUrlKey: 'secure_url',
+        activeProfileId: 'storage_main',
+        profiles: createDefaultStorageProfiles(),
         stateUrl: '',
         stateHeaderName: '',
         stateHeaderVal: '',
@@ -1603,6 +1751,19 @@
         });
     }
 
+    function markUnpublishedChanges(dirty) {
+      appState.hasUnpublishedChanges = Boolean(dirty);
+      var badge = document.getElementById('author-dirty-indicator');
+      if (!badge) return;
+      if (appState.hasUnpublishedChanges) {
+        badge.classList.remove('is-clean');
+        badge.textContent = '● Есть несохранённые изменения (нажмите «Сохранить изменения в сеть»)';
+      } else {
+        badge.classList.add('is-clean');
+        badge.textContent = '✓ Все изменения опубликованы';
+      }
+    }
+
     function saveStateToLS() {
       try {
         safeLSSet(LS_KEY, JSON.stringify({
@@ -1619,28 +1780,57 @@
       } catch (e) {}
     }
 
+    function isProfileConfigured(p) {
+      if (!p || typeof p !== 'object') return false;
+      if (p.provider === 'cloudinary') {
+        return Boolean(p.cloudName && p.cloudName.trim() && p.uploadPreset && p.uploadPreset.trim());
+      }
+      return Boolean(p.uploadUrl && p.uploadUrl.trim());
+    }
+
     function loadCloudConfigFromLS() {
       var raw = safeLSGet(CLOUD_CFG_KEY);
       if (!raw) return;
       try {
         var parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object') {
-          for (var k in parsed) {
-            if (Object.prototype.hasOwnProperty.call(parsed, k) && Object.prototype.hasOwnProperty.call(appState.cloudConfig, k)) {
-              appState.cloudConfig[k] = parsed[k];
-            }
-          }
+        if (!parsed || typeof parsed !== 'object') return;
+        if (Array.isArray(parsed.profiles) && parsed.profiles.length) {
+          appState.cloudConfig.profiles = parsed.profiles;
+        } else if (parsed.provider || parsed.cloudName || parsed.uploadUrl) {
+          // Миграция с предыдущей версии конфигурации одного хранилища
+          var migrated = createDefaultStorageProfiles();
+          migrated[0].provider = parsed.provider || 'cloudinary';
+          migrated[0].cloudName = parsed.cloudName || '';
+          migrated[0].uploadPreset = parsed.uploadPreset || '';
+          migrated[0].uploadUrl = parsed.uploadUrl || '';
+          migrated[0].urlKey = parsed.uploadUrlKey || 'secure_url';
+          appState.cloudConfig.profiles = migrated;
         }
+        if (parsed.activeProfileId) {
+          appState.cloudConfig.activeProfileId = parsed.activeProfileId;
+        }
+        if (!appState.cloudConfig.profiles.some(function (p) { return p.id === appState.cloudConfig.activeProfileId; })) {
+          appState.cloudConfig.activeProfileId = appState.cloudConfig.profiles[0].id;
+        }
+        if (typeof parsed.stateUrl === 'string') appState.cloudConfig.stateUrl = parsed.stateUrl;
+        if (typeof parsed.stateHeaderName === 'string') appState.cloudConfig.stateHeaderName = parsed.stateHeaderName;
+        if (typeof parsed.stateHeaderVal === 'string') appState.cloudConfig.stateHeaderVal = parsed.stateHeaderVal;
+        if (typeof parsed.autoSync === 'boolean') appState.cloudConfig.autoSync = parsed.autoSync;
       } catch (e) {}
     }
 
-    function hasFileUploadCloud() {
-      var c = appState.cloudConfig;
-      if (!c) return false;
-      if (c.provider === 'cloudinary') {
-        return Boolean(c.cloudName && c.cloudName.trim() && c.uploadPreset && c.uploadPreset.trim());
+    function getActiveStorageProfile() {
+      var profiles = appState.cloudConfig.profiles || [];
+      for (var i = 0; i < profiles.length; i++) {
+        if (profiles[i].id === appState.cloudConfig.activeProfileId) {
+          return profiles[i];
+        }
       }
-      return Boolean(c.uploadUrl && c.uploadUrl.trim());
+      return profiles[0] || null;
+    }
+
+    function hasAnyConfiguredStorage() {
+      return (appState.cloudConfig.profiles || []).some(isProfileConfigured);
     }
 
     function hasStateCloud() {
@@ -1651,113 +1841,286 @@
     function updateCloudStatusBadge(textOverride, onlineOverride) {
       var badge = document.getElementById('cloud-status-badge');
       if (!badge) return;
-      var active = typeof onlineOverride === 'boolean' ? onlineOverride : (hasStateCloud() || hasFileUploadCloud());
+      var configuredCount = (appState.cloudConfig.profiles || []).filter(isProfileConfigured).length;
+      var active = typeof onlineOverride === 'boolean' ? onlineOverride : (hasStateCloud() || configuredCount > 0);
       badge.classList.toggle('is-online', active);
       badge.classList.toggle('is-offline', !active);
       if (textOverride) {
         badge.textContent = textOverride;
-      } else if (hasStateCloud() && hasFileUploadCloud()) {
-        badge.textContent = '● Облако подключено (Файлы + Синхронизация)';
+      } else if (hasStateCloud() && configuredCount > 0) {
+        badge.textContent = '● Сеть подключена • Хранилищ: ' + configuredCount;
       } else if (hasStateCloud()) {
-        badge.textContent = '● Синхронизация состояния активна';
-      } else if (hasFileUploadCloud()) {
-        badge.textContent = '● Облачная загрузка файлов активна';
+        badge.textContent = '● Общая сеть подключена';
+      } else if (configuredCount > 0) {
+        badge.textContent = '● Профилей хранилищ: ' + configuredCount;
       } else {
-        badge.textContent = '● Локальный режим (без внешнего облака)';
+        badge.textContent = '● Локальный режим (добавьте хранилище или сеть)';
       }
+    }
+
+    function renderStorageSelectors() {
+      var selects = [
+        document.getElementById('active-storage-select-images'),
+        document.getElementById('active-storage-select-movies'),
+        document.getElementById('active-storage-select-arts')
+      ];
+      var profiles = appState.cloudConfig.profiles || [];
+      var activeId = appState.cloudConfig.activeProfileId;
+
+      selects.forEach(function (sel) {
+        if (!sel) return;
+        sel.innerHTML = profiles.map(function (p) {
+          var statusMark = isProfileConfigured(p) ? ' [настроено]' : ' [не заполнено]';
+          return '<option value="' + esc(p.id) + '"' + (p.id === activeId ? ' selected' : '') + '>' +
+            esc(p.name) + statusMark +
+          '</option>';
+        }).join('');
+      });
+    }
+
+    function renderStorageProfilesList() {
+      var listEl = document.getElementById('storage-profiles-list');
+      if (!listEl) return;
+      var profiles = appState.cloudConfig.profiles || [];
+      var activeId = appState.cloudConfig.activeProfileId;
+
+      listEl.innerHTML = profiles.map(function (p) {
+        var isSelected = p.id === activeId;
+        var ready = isProfileConfigured(p);
+        var details = p.provider === 'cloudinary'
+          ? 'Cloudinary • cloud: ' + (p.cloudName || '—') + ' • preset: ' + (p.uploadPreset || '—')
+          : 'HTTP POST • ' + (p.uploadUrl || 'URL не указан');
+
+        return '<div class="storage-profile-card' + (isSelected ? ' is-selected' : '') + '">' +
+          '<div class="storage-profile-meta">' +
+            '<div class="storage-profile-title">' +
+              '<span>' + esc(p.name) + '</span>' +
+              (isSelected ? '<span class="storage-tag">Активно</span>' : '') +
+              '<span class="storage-tag" style="background:' + (ready ? 'rgba(16,185,129,0.2);color:#a7f3d0;' : 'rgba(245,158,11,0.18);color:#fde68a;') + '">' +
+                (ready ? 'Готово' : 'Требует настройки') +
+              '</span>' +
+            '</div>' +
+            '<div class="storage-profile-sub">' + esc(details) + '</div>' +
+          '</div>' +
+          '<div class="slot-btns">' +
+            '<button type="button" class="btn-sky" onclick="appSelectStorageProfile(\'' + esc(p.id) + '\')">Выбрать</button>' +
+            '<button type="button" class="btn-sky-outline" onclick="appEditStorageProfile(\'' + esc(p.id) + '\')">Изменить</button>' +
+            (profiles.length > 1
+              ? '<button type="button" class="btn-del" onclick="appDeleteStorageProfile(\'' + esc(p.id) + '\')">Удалить</button>'
+              : '') +
+          '</div>' +
+        '</div>';
+      }).join('');
     }
 
     function syncCloudFormFromState() {
       var c = appState.cloudConfig;
-      var provEl = document.getElementById('cloud-upload-provider');
-      if (!provEl) return;
-      provEl.value = c.provider || 'cloudinary';
-      document.getElementById('cloud-name').value = c.cloudName || '';
-      document.getElementById('cloud-preset').value = c.uploadPreset || '';
-      document.getElementById('cloud-upload-url').value = c.uploadUrl || '';
-      document.getElementById('cloud-upload-url-key').value = c.uploadUrlKey || 'secure_url';
-      document.getElementById('cloud-state-url').value = c.stateUrl || '';
+      var stateUrlEl = document.getElementById('cloud-state-url');
+      if (!stateUrlEl) return;
+      stateUrlEl.value = c.stateUrl || '';
       document.getElementById('cloud-state-header-name').value = c.stateHeaderName || '';
       document.getElementById('cloud-state-header-val').value = c.stateHeaderVal || '';
       document.getElementById('cloud-auto-sync').checked = c.autoSync !== false;
-      appToggleCloudProviderFields();
+      renderStorageProfilesList();
+      renderStorageSelectors();
       updateCloudStatusBadge();
     }
 
-    window.appToggleCloudProviderFields = function () {
-      var prov = document.getElementById('cloud-upload-provider').value;
-      document.getElementById('cloud-cloudinary-fields').classList.toggle('is-hidden', prov !== 'cloudinary');
-      document.getElementById('cloud-custom-upload-fields').classList.toggle('is-hidden', prov === 'cloudinary');
+    window.appSelectStorageProfile = function (profileId) {
+      if (!appState.isAuthor) return;
+      var exists = (appState.cloudConfig.profiles || []).some(function (p) { return p.id === profileId; });
+      if (!exists) return;
+      appState.cloudConfig.activeProfileId = profileId;
+      saveCloudConfigToLS();
+      renderStorageProfilesList();
+      renderStorageSelectors();
+      updateCloudStatusBadge();
+      var chosen = getActiveStorageProfile();
+      if (chosen) {
+        notify('Выбрано хранилище: ' + chosen.name);
+      }
     };
 
-    window.appSaveCloudConfig = function (e) {
+    window.appToggleProfileProviderFields = function () {
+      var prov = document.getElementById('sp-provider').value;
+      document.getElementById('sp-cloudinary-box').classList.toggle('is-hidden', prov !== 'cloudinary');
+      document.getElementById('sp-custom-box').classList.toggle('is-hidden', prov === 'cloudinary');
+    };
+
+    window.appStartNewStorageProfile = function () {
+      document.getElementById('sp-edit-id').value = '';
+      document.getElementById('sp-name').value = '';
+      document.getElementById('sp-provider').value = 'cloudinary';
+      document.getElementById('sp-cloud-name').value = '';
+      document.getElementById('sp-upload-preset').value = '';
+      document.getElementById('sp-upload-url').value = '';
+      document.getElementById('sp-field-name').value = 'file';
+      document.getElementById('sp-header-name').value = '';
+      document.getElementById('sp-header-val').value = '';
+      document.getElementById('sp-url-key').value = 'url';
+      appToggleProfileProviderFields();
+    };
+
+    window.appEditStorageProfile = function (profileId) {
+      var p = (appState.cloudConfig.profiles || []).find(function (item) { return item.id === profileId; });
+      if (!p) return;
+      document.getElementById('sp-edit-id').value = p.id;
+      document.getElementById('sp-name').value = p.name || '';
+      document.getElementById('sp-provider').value = p.provider || 'cloudinary';
+      document.getElementById('sp-cloud-name').value = p.cloudName || '';
+      document.getElementById('sp-upload-preset').value = p.uploadPreset || '';
+      document.getElementById('sp-upload-url').value = p.uploadUrl || '';
+      document.getElementById('sp-field-name').value = p.fieldName || 'file';
+      document.getElementById('sp-header-name').value = p.headerName || '';
+      document.getElementById('sp-header-val').value = p.headerVal || '';
+      document.getElementById('sp-url-key').value = p.urlKey || (p.provider === 'cloudinary' ? 'secure_url' : 'url');
+      appToggleProfileProviderFields();
+    };
+
+    window.appSaveStorageProfile = function (e) {
       e.preventDefault();
       if (!appState.isAuthor) return;
-      appState.cloudConfig = {
-        provider: document.getElementById('cloud-upload-provider').value,
-        cloudName: document.getElementById('cloud-name').value.trim(),
-        uploadPreset: document.getElementById('cloud-preset').value.trim(),
-        uploadUrl: document.getElementById('cloud-upload-url').value.trim(),
-        uploadUrlKey: (document.getElementById('cloud-upload-url-key').value.trim() || 'secure_url'),
-        stateUrl: document.getElementById('cloud-state-url').value.trim(),
-        stateHeaderName: document.getElementById('cloud-state-header-name').value.trim(),
-        stateHeaderVal: document.getElementById('cloud-state-header-val').value.trim(),
-        autoSync: document.getElementById('cloud-auto-sync').checked
+
+      var editId = document.getElementById('sp-edit-id').value.trim();
+      var name = document.getElementById('sp-name').value.trim();
+      var provider = document.getElementById('sp-provider').value;
+      var profileObj = {
+        id: editId || ('storage_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6)),
+        name: name,
+        provider: provider,
+        cloudName: document.getElementById('sp-cloud-name').value.trim(),
+        uploadPreset: document.getElementById('sp-upload-preset').value.trim(),
+        uploadUrl: document.getElementById('sp-upload-url').value.trim(),
+        fieldName: document.getElementById('sp-field-name').value.trim() || 'file',
+        headerName: document.getElementById('sp-header-name').value.trim(),
+        headerVal: document.getElementById('sp-header-val').value.trim(),
+        urlKey: document.getElementById('sp-url-key').value.trim() || (provider === 'cloudinary' ? 'secure_url' : 'url')
       };
+
+      var list = appState.cloudConfig.profiles || [];
+      var idx = list.findIndex(function (item) { return item.id === profileObj.id; });
+      if (idx >= 0) {
+        list[idx] = profileObj;
+      } else {
+        list.push(profileObj);
+      }
+      appState.cloudConfig.profiles = list;
+      appState.cloudConfig.activeProfileId = profileObj.id;
+
+      saveCloudConfigToLS();
+      syncCloudFormFromState();
+      appStartNewStorageProfile();
+      notify('Профиль хранилища «' + name + '» сохранён и выбран!');
+    };
+
+    window.appDeleteStorageProfile = function (profileId) {
+      if (!appState.isAuthor) return;
+      var list = (appState.cloudConfig.profiles || []).filter(function (item) { return item.id !== profileId; });
+      if (!list.length) {
+        list = createDefaultStorageProfiles();
+      }
+      appState.cloudConfig.profiles = list;
+      if (appState.cloudConfig.activeProfileId === profileId) {
+        appState.cloudConfig.activeProfileId = list[0].id;
+      }
+      saveCloudConfigToLS();
+      syncCloudFormFromState();
+      notify('Профиль хранилища удалён.');
+    };
+
+    window.appSaveCloudStateConfig = function (e) {
+      e.preventDefault();
+      if (!appState.isAuthor) return;
+      appState.cloudConfig.stateUrl = document.getElementById('cloud-state-url').value.trim();
+      appState.cloudConfig.stateHeaderName = document.getElementById('cloud-state-header-name').value.trim();
+      appState.cloudConfig.stateHeaderVal = document.getElementById('cloud-state-header-val').value.trim();
+      appState.cloudConfig.autoSync = document.getElementById('cloud-auto-sync').checked;
       saveCloudConfigToLS();
       updateCloudStatusBadge();
-      notify('Настройки облачного хранилища сохранены!');
+      notify('Адрес общей сети сохранён!');
       if (hasStateCloud()) {
         appPullCloudState(false);
       }
     };
 
-    window.appClearCloudConfig = function () {
+    window.appClearCloudStateConfig = function () {
       if (!appState.isAuthor) return;
-      appState.cloudConfig = {
-        provider: 'cloudinary',
-        cloudName: '',
-        uploadPreset: '',
-        uploadUrl: '',
-        uploadUrlKey: 'secure_url',
-        stateUrl: '',
-        stateHeaderName: '',
-        stateHeaderVal: '',
-        autoSync: true
-      };
+      appState.cloudConfig.stateUrl = '';
+      appState.cloudConfig.stateHeaderName = '';
+      appState.cloudConfig.stateHeaderVal = '';
       saveCloudConfigToLS();
       syncCloudFormFromState();
-      notify('Облачные настройки очищены, используется локальное хранилище.');
+      notify('Адрес общей сети очищен.');
     };
 
-    /* Загружает файл (картинку или видео) во внешнее облачное хранилище и возвращает публичный URL */
-    function uploadMediaToCloud(file, resourceType, cb) {
+    function extractUrlByPath(obj, pathStr) {
+      if (!obj || typeof obj !== 'object') return null;
+      if (pathStr) {
+        var parts = pathStr.split('.');
+        var cur = obj;
+        for (var i = 0; i < parts.length; i++) {
+          if (cur && typeof cur === 'object' && parts[i] in cur) {
+            cur = cur[parts[i]];
+          } else {
+            cur = null;
+            break;
+          }
+        }
+        if (typeof cur === 'string' && cur.trim()) return cur.trim();
+      }
+      if (typeof obj.secure_url === 'string' && obj.secure_url.trim()) return obj.secure_url.trim();
+      if (typeof obj.url === 'string' && obj.url.trim()) return obj.url.trim();
+      if (obj.data && typeof obj.data.url === 'string' && obj.data.url.trim()) return obj.data.url.trim();
+      return null;
+    }
+
+    /* Загружает файл в выбранный профиль облачного хранилища и возвращает публичный URL */
+    function uploadMediaToCloud(file, resourceType, cb, specificProfileId) {
       if (!file) {
         cb(null, null);
         return;
       }
-      if (!hasFileUploadCloud()) {
-        cb(null, null);
+
+      var profile = null;
+      if (specificProfileId) {
+        profile = (appState.cloudConfig.profiles || []).find(function (p) { return p.id === specificProfileId; }) || null;
+      }
+      if (!profile || !isProfileConfigured(profile)) {
+        var current = getActiveStorageProfile();
+        if (isProfileConfigured(current)) {
+          profile = current;
+        } else {
+          profile = (appState.cloudConfig.profiles || []).find(isProfileConfigured) || null;
+        }
+      }
+
+      if (!profile) {
+        cb(null, 'не настроено ни одно хранилище');
         return;
       }
 
-      var c = appState.cloudConfig;
       var endpoint = '';
       var formData = new FormData();
-      formData.append('file', file);
+      var fieldKey = profile.fieldName || 'file';
+      formData.append(fieldKey, file);
 
-      if (c.provider === 'cloudinary') {
+      var fetchHeaders = {};
+      if (profile.provider === 'cloudinary') {
         var rType = resourceType === 'video' ? 'video' : 'image';
-        endpoint = 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(c.cloudName) + '/' + rType + '/upload';
-        formData.append('upload_preset', c.uploadPreset);
+        endpoint = 'https://api.cloudinary.com/v1_1/' + encodeURIComponent(profile.cloudName) + '/' + rType + '/upload';
+        formData.append('upload_preset', profile.uploadPreset);
       } else {
-        endpoint = c.uploadUrl;
+        endpoint = profile.uploadUrl;
         formData.append('resourceType', resourceType || 'auto');
+        if (profile.headerName && profile.headerVal) {
+          fetchHeaders[profile.headerName] = profile.headerVal;
+        }
       }
 
-      notify('Загрузка файла в облако...');
+      notify('Загрузка в «' + profile.name + '»...');
       fetch(endpoint, {
         method: 'POST',
+        headers: fetchHeaders,
         body: formData
       })
         .then(function (resp) {
@@ -1765,13 +2128,12 @@
           return resp.json();
         })
         .then(function (data) {
-          var key = c.uploadUrlKey || 'secure_url';
-          var url = data[key] || data.secure_url || data.url || (data.data && data.data.url) || null;
-          if (!url) throw new Error('URL not found in cloud response');
-          cb(url, null);
+          var url = extractUrlByPath(data, profile.urlKey);
+          if (!url) throw new Error('в ответе хранилища не найден URL');
+          cb(url, null, profile.name);
         })
         .catch(function (err) {
-          cb(null, err && err.message ? err.message : 'Ошибка загрузки в облако');
+          cb(null, err && err.message ? err.message : 'ошибка загрузки', profile.name);
         });
     }
 
@@ -1843,15 +2205,16 @@
 
       if (changed) {
         saveStateToLS();
+        markUnpublishedChanges(false);
         renderAll();
       }
       return changed;
     }
 
-    /* Скачивает актуальное состояние сайта из облака (доступно всем зрителям) */
+    /* Скачивает актуальное состояние сайта из сети (доступно всем зрителям) */
     window.appPullCloudState = function (showToast) {
       if (!hasStateCloud()) {
-        if (showToast) notify('URL облачного состояния не настроен.');
+        if (showToast) notify('Укажите URL общей сети во вкладке «Облако и сохранение».');
         return;
       }
       fetch(appState.cloudConfig.stateUrl, {
@@ -1864,21 +2227,21 @@
         })
         .then(function (json) {
           var ok = applyRemoteState(json);
-          updateCloudStatusBadge('● Синхронизировано с облаком', true);
+          updateCloudStatusBadge('● Синхронизировано с сетью', true);
           if (showToast) {
-            notify(ok ? 'Данные загружены из облака!' : 'Облако ответило, но данные пусты.');
+            notify(ok ? 'Изменения загружены из сети!' : 'Ответ получен, но данных пока нет.');
           }
         })
         .catch(function () {
-          updateCloudStatusBadge('● Ошибка связи с облаком', false);
-          if (showToast) notify('Не удалось загрузить состояние из облака.');
+          updateCloudStatusBadge('● Нет связи с сетью', false);
+          if (showToast) notify('Не удалось загрузить данные из сети.');
         });
     };
 
-    /* Отправляет текущее состояние сайта в облако (в режиме автора) */
+    /* Публикует все текущие локальные изменения в общую сеть для всех пользователей */
     window.appPushCloudState = function (showToast) {
       if (!hasStateCloud()) {
-        if (showToast) notify('Укажите URL облачного состояния во вкладке «Облако».');
+        if (showToast) notify('Сначала укажите URL общей сети во вкладке «Облако и сохранение».');
         return;
       }
       var cleanMovies = sortNewestFirst(appState.movies).filter(function (m) {
@@ -1905,6 +2268,8 @@
         arts: cleanArts
       });
 
+      if (showToast) notify('Публикация изменений в сеть...');
+
       fetch(appState.cloudConfig.stateUrl, {
         method: 'PUT',
         headers: buildStateHeaders(),
@@ -1912,12 +2277,13 @@
       })
         .then(function (resp) {
           if (!resp.ok) throw new Error('HTTP ' + resp.status);
-          updateCloudStatusBadge('● Опубликовано в облаке', true);
-          if (showToast) notify('Состояние сайта выгружено в облако!');
+          markUnpublishedChanges(false);
+          updateCloudStatusBadge('● Опубликовано для всех', true);
+          if (showToast) notify('Все изменения сохранены в сеть и видны всем!');
         })
         .catch(function () {
-          updateCloudStatusBadge('● Ошибка отправки в облако', false);
-          if (showToast) notify('Не удалось отправить состояние в облако.');
+          updateCloudStatusBadge('● Ошибка публикации в сеть', false);
+          if (showToast) notify('Не удалось сохранить изменения в сеть.');
         });
     };
 
@@ -1956,8 +2322,8 @@
           tx.objectStore('settings').put({ k: k, v: v });
         } catch (e) {}
       }
-      if (appState.isAuthor && hasStateCloud() && (typeof v !== 'object' || v === null)) {
-        appPushCloudState(false);
+      if (appState.isAuthor) {
+        markUnpublishedChanges(true);
       }
     }
 
@@ -1979,8 +2345,8 @@
           tx.objectStore(store).put(obj);
         } catch (e) {}
       }
-      if (appState.isAuthor && hasStateCloud()) {
-        appPushCloudState(false);
+      if (appState.isAuthor) {
+        markUnpublishedChanges(true);
       }
     }
 
@@ -1995,8 +2361,8 @@
           tx.objectStore(store).delete(id);
         } catch (e) {}
       }
-      if (appState.isAuthor && hasStateCloud()) {
-        appPushCloudState(false);
+      if (appState.isAuthor) {
+        markUnpublishedChanges(true);
       }
     }
 
@@ -2041,7 +2407,7 @@
         home.classList.remove('is-hidden');
       }
       window.scrollTo(0, 0);
-      if (appState.cloudConfig.autoSync !== false && hasStateCloud()) {
+      if (appState.cloudConfig.autoSync !== false && hasStateCloud() && !appState.hasUnpublishedChanges) {
         appPullCloudState(false);
       }
     };
@@ -2123,6 +2489,7 @@
       renderMoviesGrid();
       renderArtsGrid();
       renderSlotsEditor();
+      renderStorageSelectors();
     }
 
     function renderMoviesGrid() {
@@ -2308,6 +2675,7 @@
       for (var i = 0; i < els.length; i++) {
         els[i].classList.toggle('is-hidden', !flag);
       }
+      markUnpublishedChanges(appState.hasUnpublishedChanges);
       renderAll();
     }
 
@@ -2336,6 +2704,8 @@
       }
       if (tab === 'cloud') {
         syncCloudFormFromState();
+      } else {
+        renderStorageSelectors();
       }
     };
 
@@ -2358,18 +2728,18 @@
       var slotId = appState.activeSlot;
       var file = input.files[0];
 
-      if (hasFileUploadCloud()) {
-        uploadMediaToCloud(file, 'image', function (cloudUrl, err) {
+      if (hasAnyConfiguredStorage()) {
+        uploadMediaToCloud(file, 'image', function (cloudUrl, err, profileName) {
           if (cloudUrl) {
             dbSaveSetting(slotId, cloudUrl);
             renderAll();
-            notify('Картинка загружена в облако и сохранена!');
+            notify('Загружено в «' + profileName + '». Нажмите «Сохранить изменения в сеть» для публикации.');
           } else {
             readFileAsDataURL(file, function (dataUrl) {
               if (dataUrl) {
                 dbSaveSetting(slotId, dataUrl);
                 renderAll();
-                notify('Облако недоступно (' + err + '), сохранено локально.');
+                notify('Хранилище «' + (profileName || '') + '» недоступно (' + err + '), сохранено локально.');
               }
             });
           }
@@ -2381,18 +2751,18 @@
         if (dataUrl) {
           dbSaveSetting(slotId, dataUrl);
           renderAll();
-          notify('Картинка обновлена!');
+          notify('Картинка обновлена локально!');
         }
       });
     };
 
     window.appPromptSlotUrl = function (slotId) {
       if (!appState.isAuthor) return;
-      var url = window.prompt('Вставьте прямую ссылку на картинку (https://...):');
+      var url = window.prompt('Вставьте прямую ссылку на картинку из любого хранилища (https://...):');
       if (url && url.trim()) {
         dbSaveSetting(slotId, url.trim());
         renderAll();
-        notify('Ссылка сохранена!');
+        notify('Ссылка сохранена! Не забудьте нажать «Сохранить изменения в сеть».');
       }
     };
 
@@ -2440,12 +2810,12 @@
         appCloseAuthor();
         appGo('movies');
         renderAll();
-        notify('Мультфильм добавлен!');
+        notify('Мультфильм добавлен! Нажмите «Сохранить изменения в сеть», чтобы опубликовать всем.');
       }
 
       function resolveThumbAndSave(videoSrc) {
         if (thumbFile) {
-          if (hasFileUploadCloud()) {
+          if (hasAnyConfiguredStorage()) {
             uploadMediaToCloud(thumbFile, 'image', function (cThumbUrl, err) {
               if (cThumbUrl) {
                 finishMovie(videoSrc, cThumbUrl);
@@ -2465,7 +2835,7 @@
       }
 
       if (file) {
-        if (hasFileUploadCloud()) {
+        if (hasAnyConfiguredStorage()) {
           uploadMediaToCloud(file, 'video', function (cloudVideoUrl, err) {
             if (cloudVideoUrl) {
               resolveThumbAndSave(cloudVideoUrl);
@@ -2490,7 +2860,7 @@
       if (!appState.isAuthor) return;
       dbDeleteRecord('movies', id);
       renderAll();
-      notify('Мультфильм удалён.');
+      notify('Мультфильм удалён локально.');
     };
 
     window.appAddArt = function (e) {
@@ -2520,11 +2890,11 @@
         appCloseAuthor();
         appGo('arts');
         renderAll();
-        notify('Арт добавлен!');
+        notify('Арт добавлен! Нажмите «Сохранить изменения в сеть», чтобы опубликовать всем.');
       }
 
       if (file) {
-        if (hasFileUploadCloud()) {
+        if (hasAnyConfiguredStorage()) {
           uploadMediaToCloud(file, 'image', function (cloudImgUrl, err) {
             if (cloudImgUrl) {
               saveArt(cloudImgUrl);
@@ -2547,7 +2917,7 @@
       if (!appState.isAuthor) return;
       dbDeleteRecord('arts', id);
       renderAll();
-      notify('Арт удалён.');
+      notify('Арт удалён локально.');
     };
 
     window.appExportBackup = function () {
